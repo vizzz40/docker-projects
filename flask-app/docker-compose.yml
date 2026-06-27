@@ -1,0 +1,29 @@
+services:
+  #db service
+  db-server:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: employee_db
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: Passw0rd
+    
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "db_user", "-pPassw0rd"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+
+
+  #Web app service
+  web-server:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      MYSQL_DATABASE_HOST: db-server
+    depends_on:
+      db-server:
+        condition: service_healthy
+        
